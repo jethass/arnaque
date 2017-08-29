@@ -6,17 +6,17 @@ require_once '../repository/ReportingFraude.php';
 $dbLink = DatabaseLink::getInstance('w2000')->slave();
 $outputResult = array('success' => true, 'error' => '');
 
-$statementCheckIP = $dbLink->prepare(ReportingFraude::checkIfIPInWhiteList($_POST['allowedIp']));
+$statementCheckIP = $dbLink->prepare(ReportingFraude::checkIfIPInBlackList($_POST['disallowedIp']));
 $statementCheckIP->execute();
 $queryResult = $statementCheckIP->fetch();
 
 if ($queryResult[0] == 0) {
+
+    $statementDeleteFromWhiteList = $dbLink->prepare(ReportingFraude::deleteIpFromWhiteList($_POST['disallowedIp']));
+    $statementDeleteFromWhiteList->execute();
     
-    $statementDeleteFromBlackList = $dbLink->prepare(ReportingFraude::deleteIpFromBlackList($_POST['allowedIp']));
-    $statementDeleteFromBlackList->execute();
-    
-    $statementWhiteListIP = $dbLink->prepare(ReportingFraude::addIpInWhiteList($_POST['allowedIp']));
-    $requestSuccess = $statementWhiteListIP->execute();
+    $statementBlackListIP = $dbLink->prepare(ReportingFraude::addIpInBlackList($_POST['disallowedIp']));
+    $requestSuccess = $statementBlackListIP->execute();
     if (!$requestSuccess){
         $outputResult['error'] = 'Database error: Insertion failed';
         $outputResult['success'] = false;

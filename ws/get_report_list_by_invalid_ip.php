@@ -3,6 +3,7 @@
 require_once 'lib/DatabaseLink.php';
 require_once '../repository/ReportingFraude.php';
 require_once '../lib/WhiteListCheckIp.php';
+require_once '../lib/BlackListCheckIp.php';
 
 $dbLink = DatabaseLink::getInstance('w2000')->slave();
 
@@ -15,6 +16,7 @@ while ($row = $statement->fetch(PDO::FETCH_NUM)) {
     $result['references'] = $row[0];
     $result['ip'] = $row[1];
     $result['display_allow_ip_button'] = !isIpInWhiteList($dbLink, $row[1]);
+    $result['display_disallow_ip_button'] = !isIpInBlackList($dbLink, $row[1]);
     $results[] = $result;
 }
 

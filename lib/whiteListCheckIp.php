@@ -1,4 +1,5 @@
 <?php
+
 /*
  * check si l'ip est dans le whitelist
  */

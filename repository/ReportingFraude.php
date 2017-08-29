@@ -99,12 +99,48 @@ SQL;
         return $sql;
     }
 
+    public static function deleteIpFromWhiteList($ip){
+        $longIp=ip2long($ip);
+        $sql ="DELETE FROM w2000.w_ip_ok 
+              where start='".$ip."' 
+              AND end='".$ip."' 
+              AND long_start='".$longIp."' 
+              AND long_end='".$longIp."'";
+        return $sql;
+    }
     public static function addIpInWhiteList($ip){
         $longIp=ip2long($ip);
         $sql ="INSERT INTO w2000.w_ip_ok
                (`start`,`end`,`long_start`,`long_end`)
                 VALUES
                ('".$ip."','".$ip."',$longIp,$longIp)";
+        return $sql;
+    }
+
+    public static function checkIfIPInBlackList($ip)
+    {
+        $sql ="SELECT count(*) 
+               FROM w2000.w_ip_blacklist 
+               WHERE start = '" . $ip . "' OR  end = '" . $ip . "'";
+        return $sql;
+    }
+
+    public static function deleteIpFromBlackList($ip){
+        $longIp=ip2long($ip);
+        $sql ="DELETE FROM w2000.w_ip_blacklist 
+              where start='".$ip."' 
+              AND end='".$ip."' 
+              AND long_start='".$longIp."' 
+              AND long_end='".$longIp."'";
+        return $sql;
+    }
+
+    public static function addIpInBlackList($ip){
+        $longIp=ip2long($ip);
+        $sql ="INSERT INTO w2000.w_ip_blacklist
+               (`start`,`end`,`long_start`,`long_end`,`code`,`country`)
+                VALUES
+               ('".$ip."','".$ip."',$longIp,$longIp,'EU','Europe')";
         return $sql;
     }
 }

@@ -31,10 +31,10 @@
                     <thead>
                         <th width="100">Références</th>
                         <th width="100">Adresses IP</th>
-                        <th width="100">Occurence</th>
+                        <th width="50">Occurence</th>
                         <th width="200">Destinataires</th>
                         <th width="200">Contenu du mail</th>
-                        <th width="100">Actions</th>
+                        <th width="200">Actions</th>
                     </thead>
                     <tbody>
                         <tr>
@@ -119,7 +119,6 @@
         <script>
             $(document).ready(function() {
                 ModuleArnaque.load()
-                ModuleArnaque.initModalListenerAllowIp()
             });
         </script>
     </body>

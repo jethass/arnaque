@@ -25,7 +25,6 @@ var ModuleArnaque = {
         var self = this
         this.config.forEach(function (config) {
             self.loadReporting(config.route, config.mapping, config.targetId);
-
             $('#link-' + config.targetId).click(function (event) {
                 event.preventDefault();
                 self.showReporting(config.targetId)
@@ -40,23 +39,39 @@ var ModuleArnaque = {
             var htmlDatagrid = self.getHtmlGridContent(data, mapping,targetId);
             targetTable.empty();
             targetTable.append(htmlDatagrid);
-
+            targetTable.find('.link-allow').click(function(event){
+                event.preventDefault();
+                self.allowIp(event);
+            });
+            targetTable.find('.link-disallow').click(function(event){
+                event.preventDefault();
+                self.disallowIp(event);
+            });
         })
-
     },
     getHtmlGridContent: function (data, fieldsMapping,targetId) {
         var htmlDatagrid = '';
-
         data.forEach(function (element, index) {
             htmlDatagrid += '<tr>';
             fieldsMapping.forEach(function (field) {
                 htmlDatagrid += '<td>' + element[field] + '</td>';
             })
+
+            htmlDatagrid += '<td>';
+
             if (element['display_allow_ip_button'] !== undefined && element['display_allow_ip_button'] === true) {
-                htmlDatagrid += '<td><button  type="button" data-ip="' + element["ip"] + '" class="btn btn-sm btn-success link-allow " data-toggle="modal" data-target="#modal">Autoriser l\'ip</button></td>';
-            } else {
-                htmlDatagrid += '<td></td>';
+                htmlDatagrid += '<button  type="button" data-ip="' + element["ip"] + '" class="btn btn-sm btn-success link-allow " >Autoriser l\'ip</button>';
+            } else if(element['display_allow_ip_button'] !== undefined && element['display_allow_ip_button'] === false) {
+                htmlDatagrid += '<abbr style="color:#4cae4c;">IP autorisée</abbr>';
             }
+
+            if (element['display_disallow_ip_button'] !== undefined && element['display_disallow_ip_button'] === true) {
+                htmlDatagrid += '&nbsp;&nbsp;<button  type="button" data-ip="' + element["ip"] + '" class="btn btn-sm btn-danger link-disallow " >Bannir l\'ip</button>';
+            } else if(element['display_disallow_ip_button'] !== undefined && element['display_disallow_ip_button'] === false) {
+                htmlDatagrid += '&nbsp;&nbsp;<abbr style="color:#000;">IP bannie</abbr>';
+            }
+
+            htmlDatagrid += '</td>';
             htmlDatagrid += '</tr>';
         })
         return htmlDatagrid;
@@ -75,25 +90,35 @@ var ModuleArnaque = {
             }
         })
     },
-    initModalListenerAllowIp: function () {
-        $('#modal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget)
-            var ip = button.data('ip')
-            var modal = $(this)
-            $.ajax({
+    allowIp: function (event) {
+        var self = this;
+        var button = $(event.currentTarget);
+        var ip = button.data('ip');
+        $.ajax({
                 method: 'POST',
                 url: 'ws/alow_ip.php',
                 data: { allowedIp: ip }
             }).done(function(response) {
-                modal.find('.modal-title').text('Notification')
                 if (response.success == true) {
-                    modal.find('.modal-body').text('L\'IP : ' + ip +' a été autorisée.');
-                    button.hide();
-                } else {
-                    modal.find('.modal-body').text('L\'IP : ' + ip +' n\'a pas été autorisé a cause d\'un problème serveur.');
+                    button.parent().html('Traitement en cours...');
+                    self.load();
                 }
-            });
-        })
+        });
+    },
+    disallowIp: function (event) {
+        var self = this;
+        var button = $(event.currentTarget);
+        var ip = button.data('ip');
+        $.ajax({
+            method: 'POST',
+            url: 'ws/disalow_ip.php',
+            data: { disallowedIp: ip }
+        }).done(function(response) {
+            if (response.success == true) {
+                button.parent().html('Traitement en cours...');
+                self.load();
+            }
+        });
     }
 }
 
